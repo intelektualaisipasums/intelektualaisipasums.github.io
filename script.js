@@ -59,8 +59,8 @@ function izdzest_visu_kas_nav(atb){
 
 function pirmais_jaut(atb){
     var elementi_uz_ekrana =  document.querySelectorAll( 'body *' );
-    for (let index = 0; index < elementi_uz_ekrana.length; ++index) {
-        var element = elementi_uz_ekrana[index];
+    for (let i = 0; i < elementi_uz_ekrana.length; ++i) {
+        var element = elementi_uz_ekrana[i];
         if (element.id[0] == "b"){
             element.remove();
             //elementi_uz_ekrana.splice(index, 1);
@@ -68,7 +68,6 @@ function pirmais_jaut(atb){
         if (element.id == "pet"){
             if (atb==0){
                 kustinat_elementu(element, 300, -150)
-               
             }
             if (atb==1){
                 kustinat_elementu(element, 300, 0)
