@@ -83,6 +83,7 @@ function pirmais_jaut(atb){
 }}
 function uzlikt_jautajumu(){
     var div = document.createElement('div');
+    div.id = "jaut"
     div.style=`
     position:absolute;
     background-color:green;
