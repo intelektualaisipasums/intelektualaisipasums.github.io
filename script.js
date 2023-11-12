@@ -161,7 +161,8 @@ function nonemt_jautajumu(atb) {
 function PeterisIesniedzNosaukumu() {
     PeteraAtbilde = document.getElementById("PeteraAtbilde").value;
     if (PeteraAtbilde != "") {
-        
+        console.log("opaaa");
+        document.getElementById("jaut").innerHTML = "" ;    
     }
 }
 
