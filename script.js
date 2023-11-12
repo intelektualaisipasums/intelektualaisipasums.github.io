@@ -76,7 +76,7 @@ function pirmais_jaut(atb){
                 kustinat_elementu(element, 300, +150)
             }
         setTimeout(() => izdzest_visu_kas_nav(atb), 1200)
-        
+        setTimeout(() => nonemt_jautajumu(atb), 1200)
         }
 
 }}
@@ -91,7 +91,6 @@ function uzlikt_jautajumu(){
     top:100px;
     left:640px;
     border: 6px solid black;
-    cursor: pointer;
     user-select: none;;
     `;
     div.innerHTML = `
@@ -102,6 +101,7 @@ function uzlikt_jautajumu(){
         line-height: 40px;
         height:40px;
         width:200px;
+        cursor: pointer;
         border-radius: 20px;
     }
     .jaut:hover {
@@ -109,14 +109,60 @@ function uzlikt_jautajumu(){
     }
     </style>
     <center>
-    <h1>Ko Pēterim radīt?</h1>
-    <div onclick = "pirmais_jaut(0)"; class = "jaut"; >Klavier spēli</div><br>
-    <div onclick = "pirmais_jaut(1)"; class = "jaut"; >Datorprogrammu </div><br> 
-    <div onclick = "pirmais_jaut(2)"; class = "jaut"; >Raķeti </div><br> 
-    <div onclick = "pirmais_jaut(3)"; class = "jaut"; >Nošauties </div><br> 
+    <h1 id = "KoDaritJaut" >Ko Pēterim radīt?</h1>
+    <div id = "PirmaIzvele" onclick = "pirmais_jaut(0)"; class = "jaut"; >Klavier spēli</div><br>
+    <div id = "OtraIzvele" onclick = "pirmais_jaut(1)"; class = "jaut"; >Datorprogrammu </div><br> 
+    <div id = "TresaIzvele" onclick = "pirmais_jaut(2)"; class = "jaut"; >Raķeti </div><br> 
     </center>
     `;
     speles_virsma.appendChild(div);
+}
+function uzlikt_jautajumu2(atb) {
+    var div = document.createElement('div');
+    div.id = "jaut"
+    div.style=`
+    position:absolute;
+    background-color:green;
+    width:300px;
+    height:400px;
+    top:100px;
+    left:640px;
+    border: 6px solid black;
+    user-select: none;;
+    `;
+    var text1 = "Kā nosaukt Pētera Klavieroriģināldarbu?";
+    var text2 = "Kā nosaukt Pētera Datorprogrammatūru?";
+    var text3 = "Kā nosaukt Pētera Starpkontinentālo balistisko ieroci?";
+
+    var sarakstsJautajumi = [text1, text2, text3]
+
+    div.innerHTML = `
+    <h1> ${sarakstsJautajumi[atb]} </h1>
+    <center>
+        <input id = "PeteraInputs">
+        <br>
+        <br>
+        <button onclick = "PeterisIesniedzNosaukumu()" id = "PeteraAtbilde" style = "width: 80px; height: 30px;">
+        Iesniegt !
+        </button>
+    </center>
+    `
+    speles_virsma.appendChild(div);
+}
+function nonemt_jautajumu(atb) {
+    document.getElementById("KoDaritJaut").remove();
+    document.getElementById("PirmaIzvele").remove();
+    document.getElementById("OtraIzvele").remove();
+    document.getElementById("TresaIzvele").remove();
+
+    uzlikt_jautajumu2(atb);
+}
+
+function PeterisIesniedzNosaukumu() {
+    PeteraAtbilde = document.getElementById("PeteraAtbilde").value;
+    if (PeteraAtbilde != "") {
+        
+    }
 }
 
 function sakt(){
