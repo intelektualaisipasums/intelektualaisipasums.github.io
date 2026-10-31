@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ķīniešu valodas mācītājs</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef2ff, #f8fafc);
+      color: #172033;
+      display: flex;
+      justify-content: center;
+      padding: 30px 16px;
+    }
+
+    .app {
+      width: min(900px, 100%);
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0 0 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .hidden { display: none !important; }
+
+    .list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .12s, opacity .12s, background .12s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .list-button {
+      background: #e8edff;
+      color: #25336b;
+    }
+
+    .list-button:hover {
+      background: #dce4ff;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+      color: #536078;
+      font-weight: 700;
+    }
+
+    .progress-wrap {
+      height: 10px;
+      background: #e9edf5;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: #5967d9;
+      transition: width .2s;
+    }
+
+    .german-word {
+      text-align: center;
+      font-size: clamp(42px, 8vw, 72px);
+      margin: 25px 0 35px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .answer {
+      background: #f1f4f9;
+      color: #172033;
+      min-height: 64px;
+    }
+
+    .answer:hover:not(:disabled) {
+      background: #e4e9f2;
+    }
+
+    .answer.correct {
+      background: #b9f2c6;
+      color: #14532d;
+    }
+
+    .answer.wrong {
+      background: #ffc5c5;
+      color: #7f1d1d;
+    }
+
+    .answer:disabled {
+      cursor: default;
+    }
+
+    .feedback {
+      min-height: 28px;
+      text-align: center;
+      margin: 20px 0 0;
+      font-weight: 800;
+    }
+
+    .feedback.correct-text { color: #15803d; }
+    .feedback.wrong-text { color: #dc2626; }
+
+    .score {
+      text-align: center;
+      font-size: 60px;
+      font-weight: 900;
+      margin: 25px 0;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .primary {
+      background: #5967d9;
+      color: white;
+    }
+
+    .secondary {
+      background: #e9edf5;
+      color: #263044;
+    }
+
+    .error {
+      background: #fff1f1;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 18px;
+      white-space: pre-wrap;
+    }
+
+    .small {
+      color: #667085;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 20px; 
+      .answers { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Ķīniešu valodas mācītājs!</h1>
+
+    <section id="listScreen" class="card">
+      <h2>Izvēleis kuru vārdiņus ❤️</h2>
+      <p class="small">
+        Katrs tests sastāv no 60 jautājumiem
+      </p>
+      <div id="listButtons" class="list-grid"></div>
+      <div id="loadError" class="error hidden"></div>
+    </section>
+
+    <section id="gameScreen" class="card hidden">
+      <div class="topbar">
+        <span id="listName"></span>
+        <span id="questionCounter"></span>
+        <span>Score: <span id="score">0</span></span>
+      </div>
+
+      <div class="progress-wrap">
+        <div id="progress" class="progress"></div>
+      </div>
+
+      <div id="germanWord" class="german-word"></div>
+
+      <div id="answers" class="answers"></div>
+
+      <div id="feedback" class="feedback"></div>
+    </section>
+
+    <section id="resultScreen" class="card hidden center">
+      <h2>Game finished!</h2>
+      <div id="finalScore" class="score"></div>
+      <p id="resultText"></p>
+      <button id="playAgain" class="primary">Play again</button>
+      <button id="chooseList" class="secondary">Choose another list</button>
+    </section>
+  </main>
+
+  <!--
+    These are EXTERNAL JavaScript files.
+    You can open index.html directly by double-clicking it.
+    No server/hosting is required.
+  -->
+  <script src="lists/1.js"></script>
+  <script src="lists/2.js"></script>
+
+
+  <script>
+    const QUESTIONS_PER_GAME = 60;
+    const OPTIONS_PER_QUESTION = 10;
+
+    const listScreen = document.getElementById("listScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const resultScreen = document.getElementById("resultScreen");
+
+    const listButtons = document.getElementById("listButtons");
+    const loadError = document.getElementById("loadError");
+
+    const listName = document.getElementById("listName");
+    const questionCounter = document.getElementById("questionCounter");
+    const scoreElement = document.getElementById("score");
+    const progress = document.getElementById("progress");
+    const germanWord = document.getElementById("germanWord");
+    const answers = document.getElementById("answers");
+    const feedback = document.getElementById("feedback");
+
+    const finalScore = document.getElementById("finalScore");
+    const resultText = document.getElementById("resultText");
+    const playAgain = document.getElementById("playAgain");
+    const chooseList = document.getElementById("chooseList");
+
+    let currentList = null;
+    let questionNumber = 0;
+    let score = 0;
+    let currentQuestion = null;
+
+    function shuffle(array) {
+      const copy = [...array];
+
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+
+      return copy;
+    }
+
+    function showScreen(screen) {
+      listScreen.classList.add("hidden");
+      gameScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      screen.classList.remove("hidden");
+    }
+
+    function validateLists() {
+      if (!Array.isArray(window.vocabularyLists) || window.vocabularyLists.length === 0) {
+        throw new Error(
+          "No vocabulary lists were found. Check that the files in the lists/ folder are included."
+        );
+      }
+
+      window.vocabularyLists.forEach((list, index) => {
+        if (!list.name || !Array.isArray(list.words)) {
+          throw new Error(`Vocabulary list #${index + 1} is invalid.`);
+        }
+
+        if (list.words.length < OPTIONS_PER_QUESTION) {
+          throw new Error(
+            `"${list.name}" needs at least ${OPTIONS_PER_QUESTION} words. It currently has ${list.words.length}.`
+          );
+        }
+
+        list.words.forEach((word, wordIndex) => {
+          if (!Array.isArray(word) || word.length < 2 || !word[0] || !word[1]) {
+            throw new Error(
+              `Invalid word #${wordIndex + 1} in "${list.name}". Use ["German", "English"].`
+            );
+          }
+        });
+      });
+    }
+
+    function renderLists() {
+      listButtons.innerHTML = "";
+
+      window.vocabularyLists.forEach((list) => {
+        const button = document.createElement("button");
+        button.className = "list-button";
+        button.textContent = list.name;
+        button.addEventListener("click", () => startGame(list));
+        listButtons.appendChild(button);
+      });
+    }
+
+    function startGame(list) {
+      currentList = list;
+      questionNumber = 0;
+      score = 0;
+      scoreElement.textContent = score;
+
+      showScreen(gameScreen);
+      nextQuestion();
+    }
+
+    function createQuestion() {
+      const words = currentList.words;
+      const correct = words[Math.floor(Math.random() * words.length)];
+
+      const wrongAnswers = shuffle(
+        words
+          .filter(word => word[1] !== correct[1])
+          .map(word => word[1])
+      );
+
+      const uniqueWrongAnswers = [...new Set(wrongAnswers)].slice(0, OPTIONS_PER_QUESTION - 1);
+
+      // If duplicate English translations exist, keep searching until we have
+      // enough unique answer choices whenever possible.
+      const optionValues = [...new Set([correct[1], ...uniqueWrongAnswers])];
+
+      if (optionValues.length < OPTIONS_PER_QUESTION) {
+        const allUnique = [...new Set(words.map(word => word[1]))];
+        const extras = shuffle(allUnique.filter(answer => answer !== correct[1]));
+
+        for (const extra of extras) {
+          if (!optionValues.includes(extra)) {
+            optionValues.push(extra);
+          }
+          if (optionValues.length === OPTIONS_PER_QUESTION) break;
+        }
+      }
+
+      return {
+        german: correct[0],
+        correct: correct[1],
+        options: shuffle(optionValues.slice(0, OPTIONS_PER_QUESTION))
+      };
+    }
+
+    function nextQuestion() {
+      if (questionNumber >= QUESTIONS_PER_GAME) {
+        finishGame();
+        return;
+      }
+
+      questionNumber++;
+      currentQuestion = createQuestion();
+
+      listName.textContent = currentList.name;
+      questionCounter.textContent = `Question ${questionNumber} / ${QUESTIONS_PER_GAME}`;
+      progress.style.width = `${(questionNumber / QUESTIONS_PER_GAME) * 100}%`;
+
+      germanWord.textContent = currentQuestion.german;
+      feedback.textContent = "";
+      feedback.className = "feedback";
+      answers.innerHTML = "";
+
+      currentQuestion.options.forEach(option => {
+        const button = document.createElement("button");
+        button.className = "answer";
+        button.textContent = option;
+
+        button.addEventListener("click", () => answerQuestion(button, option));
+        answers.appendChild(button);
+      });
+    }
+
+    function answerQuestion(button, answer) {
+      const buttons = [...answers.querySelectorAll("button")];
+      buttons.forEach(b => b.disabled = true);
+
+      if (answer === currentQuestion.correct) {
+        score++;
+	playCorrectSound();
+        scoreElement.textContent = score;
+        button.classList.add("correct");
+        feedback.textContent = "✓ Correct!";
+        feedback.className = "feedback correct-text";
+      } else {
+        button.classList.add("wrong");
+	playWrongSound();
+        const correctButton = buttons.find(
+          b => b.textContent === currentQuestion.correct
+        );
+
+        if (correctButton) {
+          correctButton.classList.add("correct");
+        }
+
+        feedback.textContent = `✗ Wrong. Correct answer: ${currentQuestion.correct}`;
+        feedback.className = "feedback wrong-text";
+      }
+
+      setTimeout(nextQuestion, 800);
+    }
+
+    function finishGame() {
+      finalScore.textContent = `${score} / ${QUESTIONS_PER_GAME}`;
+
+      const percentage = Math.round((score / QUESTIONS_PER_GAME) * 100);
+
+      if (percentage === 100) {
+        resultText.textContent = "Perfect score!";
+      } else if (percentage >= 80) {
+        resultText.textContent = "Excellent work!";
+      } else if (percentage >= 60) {
+        resultText.textContent = "Good job! Keep practicing.";
+      } else {
+        resultText.textContent = "Keep practicing and try again.";
+      }
+
+      showScreen(resultScreen);
+    }
+
+    playAgain.addEventListener("click", () => {
+      if (currentList) startGame(currentList);
+    });
+
+    chooseList.addEventListener("click", () => {
+      showScreen(listScreen);
+    });
+
+    try {
+      validateLists();
+      renderLists();
+    } catch (error) {
+      loadError.textContent = error.message;
+      loadError.classList.remove("hidden");
+    }
+
+// ================================
+// SOUND EFFECTS
+// ================================
+
+let soundEnabled = true;
+let audioContext = null;
+
+function getAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+
+  return audioContext;
+}
+
+function playTone(frequency, duration, type = "sine", volume = 0.15) {
+  if (!soundEnabled) return;
+
+  const ctx = getAudioContext();
+  const oscillator = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  oscillator.type = type;
+  oscillator.frequency.value = frequency;
+
+  gain.gain.setValueAtTime(volume, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    ctx.currentTime + duration
+  );
+
+  oscillator.connect(gain);
+  gain.connect(ctx.destination);
+
+  oscillator.start();
+  oscillator.stop(ctx.currentTime + duration);
+}
+
+// Correct answer
+function playCorrectSound() {
+  playTone(660, 0.12, "sine", 0.15);
+
+  setTimeout(() => {
+    playTone(880, 0.18, "sine", 0.15);
+  }, 100);
+}
+
+// Wrong answer
+function playWrongSound() {
+  playTone(180, 0.25, "sawtooth", 0.12);
+}
+
+// Game finished
+function playFinishSound() {
+  playTone(523, 0.12, "sine", 0.15);
+
+  setTimeout(() => {
+    playTone(659, 0.12, "sine", 0.15);
+  }, 120);
+
+  setTimeout(() => {
+    playTone(784, 0.25, "sine", 0.15);
+  }, 240);
+}
+
+
+  </script>
+</body>
+</html>
