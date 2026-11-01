@@ -1,0 +1,57 @@
+window.vocabularyLists = window.vocabularyLists || [];
+
+window.vocabularyLists.push({
+  name: "īpašības vārdi (otrādāk)",
+  words: [
+  ["heavy", "zhòng"],
+  ["bad", "huài"],
+  ["easy", "róng yi"],
+  ["hard", "nán"],
+  ["tall", "gāo"],
+  ["dry", "gān"],
+  ["clean", "gān jìng"],
+  ["dirty", "zāng"],
+  ["dark", "àn"],
+  ["spicy", "là"],
+  ["salty", "xián"],
+  ["wide", "kuān"],
+  ["thin", "shòu"],
+  ["thick", "hòu"],
+  ["long", "cháng"],
+  ["deep", "shēn"],
+  ["beautiful", "měi"],
+  ["ugly", "chǒu"],
+  ["lazy", "lǎn"],
+  ["fat", "pàng"],
+  ["short", "ǎi"],
+  ["short", "duǎn"],
+  ["tired", "lèi"],
+  ["many", "duō"],
+  ["hard to eat", "nánchī"],
+  ["good play, fun", "hǎo wán"],
+  ["interesting, funny", "yǒu qù"],
+  ["boring", "wú liáo"],
+  ["slow", "màn"],
+  ["old", "lǎo"],
+  ["far", "yuǎn"],
+  ["close", "jìn"],
+  ["hurt, sad", "shāng xīn"],
+  ["famous", "yǒu míng"],
+  ["introverted", "nèi xiàng"],
+  ["extroverted", "wài xiàng"],
+  ["hot", "rè"],
+  ["cold", "lěng"],
+  ["good looking", "hǎo kàn"],
+  ["ugly", "nán kàn"],
+  ["angry", "shēng qì"],
+  ["happy", "gāo xìng"],
+  ["excited", "xīngfèn"],
+  ["sad", "nán guò"],
+  ["depressed", "yù mèn"],
+  ["shy", "hài xiū"],
+  ["sexy", "xìn gǎn"]
+
+
+
+  ]
+});
